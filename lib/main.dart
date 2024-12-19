@@ -6,7 +6,17 @@ import 'package:agropharm_application/App/Widget/Views/Pages/Login/login_page.da
 import 'package:agropharm_application/App/Widget/Views/Pages/Notificacao/notificacao_page.dart';
 import 'package:flutter/material.dart';
 
+import 'package:sqflite_common_ffi/sqflite_ffi.dart';
+import 'package:sqflite_common_ffi_web/sqflite_ffi_web.dart';
+import 'package:flutter/foundation.dart' show kIsWeb;
+
 void main() {
+  if (kIsWeb) {
+    databaseFactory = databaseFactoryFfiWeb;
+  } else {
+    sqfliteFfiInit();
+    databaseFactory = databaseFactoryFfi;
+  }
   runApp(const AgroPharmApp());
 }
 

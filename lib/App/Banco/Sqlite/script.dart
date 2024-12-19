@@ -4,7 +4,7 @@ const criarTabelas = [
       id INTEGER NOT NULL PRIMARY KEY,
       nome VARCHAR(200) NOT NULL,
       quantidade INTEGER NOT NULL,
-      validade DATE,
+      validade DATE NOT NULL,
       fornecedor VARCHAR(200)
     )
   '''

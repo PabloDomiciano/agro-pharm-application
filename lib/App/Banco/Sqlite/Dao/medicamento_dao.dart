@@ -48,11 +48,9 @@ class DAOMedicamento implements IDAOMedicamento {
 
     DTOMedicamento medicamento = DTOMedicamento(
       id: resultado['id'] as int,
-      nome: resultado['nome']?.toString(),
-      quantidade: resultado['quantidade'] as int?,
-      validade: resultado['validade'] != null
-          ? DateTime.parse(resultado['validade'].toString())
-          : null,
+      nome: resultado['nome'].toString(),
+      quantidade: resultado['quantidade'] as int,
+      validade: DateTime.parse(resultado['validade'].toString()),
       fornecedor: resultado['fornecedor']?.toString(),
     );
 
@@ -68,11 +66,9 @@ class DAOMedicamento implements IDAOMedicamento {
       var linha = resultado[i];
       return DTOMedicamento(
         id: linha['id'] as int,
-        nome: linha['nome']?.toString(),
-        quantidade: linha['quantidade'] as int?,
-        validade: linha['validade'] != null
-            ? DateTime.parse(linha['validade'].toString())
-            : null,
+        nome: linha['nome'].toString(),
+        quantidade: linha['quantidade'] as int,
+        validade: DateTime.parse(linha['validade'].toString()),
         fornecedor: linha['fornecedor']?.toString(),
       );
     });

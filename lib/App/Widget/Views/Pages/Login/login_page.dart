@@ -1,14 +1,18 @@
+import 'package:agropharm_application/App/Aplicacao/usuario_ap.dart';
 import 'package:agropharm_application/App/Widget/Views/Pages/Home/home_page.dart';
 import 'package:flutter/material.dart';
 
 class LoginPage extends StatefulWidget {
+  final _loginKey = GlobalKey<FormState>();
   @override
   _LoginPageState createState() => _LoginPageState();
 }
 
 class _LoginPageState extends State<LoginPage> {
-  String email = '';
-  String password = '';
+  final _emailControllador = TextEditingController();
+  final _senhaControllador = TextEditingController();
+
+  final aplicao_usuario = APPUsuario();
 
   @override
   Widget build(BuildContext context) {
@@ -52,9 +56,7 @@ class _LoginPageState extends State<LoginPage> {
 
                 // Input Email
                 TextField(
-                  onChanged: (text) {
-                    email = text;
-                  },
+                  controller: _emailControllador,
                   keyboardType: TextInputType.emailAddress,
                   decoration: InputDecoration(
                     prefixIcon: const Icon(Icons.email_outlined),
@@ -68,9 +70,7 @@ class _LoginPageState extends State<LoginPage> {
 
                 // Input Password
                 TextField(
-                  onChanged: (text) {
-                    password = text;
-                  },
+                  controller: _senhaControllador,
                   obscureText: true,
                   decoration: InputDecoration(
                     prefixIcon: const Icon(Icons.lock_outline),
@@ -86,11 +86,16 @@ class _LoginPageState extends State<LoginPage> {
                 SizedBox(
                   width: double.infinity,
                   child: ElevatedButton(
-                    onPressed: () {
-                      if (email == 'teste@gmail.com' && password == '123') {
-                        Navigator.of(context).push(MaterialPageRoute(
-                            builder: (context) => const HomePage()));
-                      } else {
+                    onPressed: () async {
+                      try {
+                        final resultado = await aplicao_usuario
+                            .consultarPorEmail(_emailControllador.text);
+                        if (resultado.email == _emailControllador.text &&
+                            resultado.senha == _senhaControllador.text) {
+                          Navigator.of(context).push(MaterialPageRoute(
+                              builder: (context) => const HomePage()));
+                        }
+                      } catch (e) {
                         ScaffoldMessenger.of(context).showSnackBar(
                           const SnackBar(
                             content: Text('Login inválido! Tente novamente.'),

@@ -1,4 +1,4 @@
-import 'package:agropharm_application/App/Banco/Sqlite/Dao/medicamento_dao.dart';
+import 'package:agropharm_application/App/Aplicacao/medicamento_ap.dart';
 import 'package:agropharm_application/App/Dominio/Dto/medicamento_dto.dart';
 import 'package:flutter/material.dart';
 
@@ -11,15 +11,42 @@ class CadastroMedicamentoPage extends StatefulWidget {
 }
 
 class _CadastroMedicamentoPageState extends State<CadastroMedicamentoPage> {
-  final _formKey = GlobalKey<FormState>();
-
-  String nome = '';
-  int quantidade = 0;
-  String validade = '';
-  String fornecedor = '';
-
+  final _cadastroKey = GlobalKey<FormState>();
   @override
   Widget build(BuildContext context) {
+    final _nomeController = TextEditingController();
+    final _quantidadeController = TextEditingController();
+    final _validadeController = TextEditingController();
+    final _fornecedorController = TextEditingController();
+
+    Future<void> criarMedicamento() async {
+      if (_cadastroKey.currentState!.validate()) {
+        final nome = _nomeController.text;
+        final quantidade = _quantidadeController.text;
+        final validade = _validadeController.text;
+        final fornecedor = _fornecedorController.text;
+
+        DTOMedicamento dto = DTOMedicamento(
+          nome: nome,
+          quantidade: int.parse(quantidade),
+          validade: DateTime.parse(validade),
+          fornecedor: fornecedor,
+        );
+
+        APPMedicamento appMedicamento = APPMedicamento();
+        await appMedicamento.salvar(dto);
+
+        _nomeController.clear();
+        _quantidadeController.clear();
+        _validadeController.clear();
+        _fornecedorController.clear();
+
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Medicamento salvo com sucesso')),
+        );
+      }
+    }
+
     return Scaffold(
       appBar: AppBar(
         title: const Text(
@@ -36,7 +63,7 @@ class _CadastroMedicamentoPageState extends State<CadastroMedicamentoPage> {
         child: Padding(
           padding: const EdgeInsets.all(16.0),
           child: Form(
-            key: _formKey,
+            key: _cadastroKey,
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
@@ -48,13 +75,11 @@ class _CadastroMedicamentoPageState extends State<CadastroMedicamentoPage> {
 
                 // Campo Nome
                 TextFormField(
+                  controller: _nomeController,
                   decoration: const InputDecoration(
                     labelText: 'Nome do Medicamento',
                     border: OutlineInputBorder(),
                   ),
-                  onChanged: (text) {
-                    nome = text;
-                  },
                   validator: (value) {
                     if (value == null || value.isEmpty) {
                       return 'O nome é obrigatório';
@@ -66,16 +91,12 @@ class _CadastroMedicamentoPageState extends State<CadastroMedicamentoPage> {
 
                 // Campo Quantidade
                 TextFormField(
+                  controller: _quantidadeController,
                   keyboardType: TextInputType.number,
                   decoration: const InputDecoration(
                     labelText: 'Quantidade',
                     border: OutlineInputBorder(),
                   ),
-                  onChanged: (text) {
-                    setState(() {
-                      quantidade = int.tryParse(text) ?? 0;
-                    });
-                  },
                   validator: (value) {
                     if (value == null || value.isEmpty) {
                       return 'A quantidade é obrigatória';
@@ -87,14 +108,12 @@ class _CadastroMedicamentoPageState extends State<CadastroMedicamentoPage> {
 
                 // Campo Validade
                 TextFormField(
+                  controller: _validadeController,
                   keyboardType: TextInputType.datetime,
                   decoration: const InputDecoration(
                     labelText: 'Data de Validade (dd/mm/aaaa)',
                     border: OutlineInputBorder(),
                   ),
-                  onChanged: (text) {
-                    validade = text;
-                  },
                   validator: (value) {
                     if (value == null || value.isEmpty) {
                       return 'A data de validade é obrigatória';
@@ -106,13 +125,11 @@ class _CadastroMedicamentoPageState extends State<CadastroMedicamentoPage> {
 
                 // Campo Fornecedor
                 TextFormField(
+                  controller: _fornecedorController,
                   decoration: const InputDecoration(
                     labelText: 'Fornecedor',
                     border: OutlineInputBorder(),
                   ),
-                  onChanged: (text) {
-                    fornecedor = text;
-                  },
                 ),
                 const SizedBox(height: 20),
 
@@ -122,45 +139,9 @@ class _CadastroMedicamentoPageState extends State<CadastroMedicamentoPage> {
                     width: double.infinity,
                     child: ElevatedButton(
                       onPressed: () async {
-                        if (_formKey.currentState!.validate()) {
-                          try {
-                            // Criação do objeto DTO
-                            DTOMedicamento(
-                              nome: nome,
-                              quantidade: quantidade,
-                              validade: DateTime.parse(
-                                  validade.split('/').reversed.join('-')),
-                              fornecedor: fornecedor,
-                            );
-
-                            // Chamada para salvar no banco usando DAO
-                            DAOMedicamento dao = DAOMedicamento();
-                            await dao.sqlInserir;
-
-                            // Exibir mensagem de sucesso
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              const SnackBar(
-                                content:
-                                    Text('Medicamento cadastrado com sucesso!'),
-                                backgroundColor: Colors.green,
-                              ),
-                            );
-
-                            // Limpar o formulário
-                            _formKey.currentState!.reset();
-
-                            // Navegar para a tela de estoque
-                            Navigator.pushReplacementNamed(context, '/estoque');
-                          } catch (e) {
-                            // Exibir mensagem de erro
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              SnackBar(
-                                content:
-                                    Text('Erro ao cadastrar medicamento: $e'),
-                                backgroundColor: Colors.red,
-                              ),
-                            );
-                          }
+                        if (_cadastroKey.currentState!.validate()) {
+                          await criarMedicamento();
+                          Navigator.pop(context);
                         }
                       },
                       style: ElevatedButton.styleFrom(
