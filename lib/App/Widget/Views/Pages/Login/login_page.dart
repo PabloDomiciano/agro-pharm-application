@@ -90,15 +90,21 @@ class _LoginPageState extends State<LoginPage> {
                       try {
                         final resultado = await aplicao_usuario
                             .consultarPorEmail(_emailControllador.text);
-                        if (resultado.email == _emailControllador.text &&
-                            resultado.senha == _senhaControllador.text) {
-                          Navigator.of(context).push(MaterialPageRoute(
-                              builder: (context) => const HomePage()));
+
+                        if (resultado.email != _emailControllador.text) {
+                          throw Exception("e-mail não encontrado");
                         }
+
+                        if (resultado.senha != _senhaControllador.text) {
+                          throw Exception("senha não encontrada");
+                        }
+
+                        Navigator.of(context).push(MaterialPageRoute(
+                            builder: (context) => const HomePage()));
                       } catch (e) {
                         ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(
-                            content: Text('Login inválido! Tente novamente.'),
+                          SnackBar(
+                            content: Text('${e}'),
                             backgroundColor: Colors.redAccent,
                           ),
                         );

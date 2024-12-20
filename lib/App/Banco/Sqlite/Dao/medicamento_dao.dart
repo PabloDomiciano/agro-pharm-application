@@ -27,8 +27,13 @@ class DAOMedicamento implements IDAOMedicamento {
   @override
   Future<DTOMedicamento> salvar(DTOMedicamento dto) async {
     _db = await Conexao.iniciar();
-    int id = await _db.rawInsert(
-        sqlInserir, [dto.nome, dto.quantidade, dto.validade, dto.fornecedor]);
+    int id = await _db.rawInsert(sqlInserir, [
+      dto.nome,
+      dto.quantidade,
+      dto.validade.toIso8601String(),
+      dto.fornecedor
+    ]);
+
     dto.id = id;
     return dto;
   }

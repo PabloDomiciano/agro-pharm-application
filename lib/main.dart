@@ -30,16 +30,11 @@ class AgroPharmApp extends StatelessWidget {
           primarySwatch: Colors.green,
         ),
         debugShowCheckedModeBanner: false,
-
-        // Definindo a tela de login como rota inicial
-        initialRoute: '/login',
-
         routes: {
           '/': (context) => LoginPage(), // Rota padrão
-          '/login': (context) => LoginPage(), // Tela de login
           '/homePage': (context) => const HomePage(), // Tela inicial após login
           '/cadastroMedicamento': (context) => const CadastroMedicamentoPage(),
-          '/visualizarEstoque': (context) => const VisualizarEstoquePage(),
+          '/visualizarEstoque': (context) => VisualizarEstoquePage(),
           '/historicoEntradas': (context) => const HistoricoEntradasPage(),
           '/notificacoes': (context) => const NotificacoesPage(),
         },

@@ -23,12 +23,12 @@ class Conexao {
             quantidade INTEGER NOT NULL,
             validade DATE NOT NULL,
             fornecedor VARCHAR(200)
-          )''',
+          );''', // Remover a vírgula extra aqui
           '''CREATE TABLE usuario(
-          id INTEGER NOT NULL PRIMARY KEY,
-          email VARCHAR(200) NOT NULL,
-          senha VARCHAR(200) NOT NULL
-          )'''
+            id INTEGER NOT NULL PRIMARY KEY,
+            email VARCHAR(200) NOT NULL,
+            senha VARCHAR(200) NOT NULL
+          );''', // Remover a vírgula extra aqui
         ];
 
         for (var tabela in tabelas) {
@@ -37,21 +37,24 @@ class Conexao {
 
         // Inserção de registros iniciais
         await db.execute('''
-   INSERT INTO medicamento (nome, quantidade, validade, fornecedor)
-    VALUES ('Paracetamol', 100, '2025-01-01', 'Farmácia Central')
-  ''');
+          INSERT INTO medicamento (nome, quantidade, validade, fornecedor)
+          VALUES ('Paracetamol', 100, '2025-01-01', 'Farmácia Central');
+        ''');
 
         await db.execute('''
-    INSERT INTO medicamento (nome, quantidade, validade, fornecedor)
-    VALUES ('Ibuprofeno', 50, '2024-12-01', 'Distribuidora Saúde')
-  ''');
+          INSERT INTO medicamento (nome, quantidade, validade, fornecedor)
+          VALUES ('Ibuprofeno', 50, '2024-12-01', 'Distribuidora Saúde');
+        ''');
 
         await db.execute('''
-    INSERT INTO medicamento (nome, quantidade, validade, fornecedor)
-    VALUES ('Amoxicilina', 200, '2025-06-15', 'Laboratório Farma')
-  ''');
-        await db.execute(
-            '''INSERT INTO usuario (email, senha) VALUES('teste@gmail.com', '123')''');
+          INSERT INTO medicamento (nome, quantidade, validade, fornecedor)
+          VALUES ('Amoxicilina', 200, '2025-06-15', 'Laboratório Farma');
+        ''');
+
+        await db.execute('''
+          INSERT INTO usuario (email, senha) 
+          VALUES('teste@gmail.com', '123');
+        ''');
       },
       onUpgrade: (db, oldVersion, newVersion) async {
         // Lógica de migração caso a versão do banco seja alterada
@@ -59,12 +62,5 @@ class Conexao {
     );
 
     return _database!;
-  }
-
-  static Future<void> fechar() async {
-    if (_database != null) {
-      await _database!.close();
-      _database = null;
-    }
   }
 }

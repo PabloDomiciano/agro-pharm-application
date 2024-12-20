@@ -1,7 +1,11 @@
+import 'package:agropharm_application/App/Aplicacao/medicamento_ap.dart';
+import 'package:agropharm_application/App/Aplicacao/usuario_ap.dart';
+import 'package:agropharm_application/App/Banco/Sqlite/Dao/medicamento_dao.dart';
+import 'package:agropharm_application/App/Dominio/Dto/medicamento_dto.dart';
 import 'package:flutter/material.dart';
 
 class VisualizarEstoquePage extends StatelessWidget {
-  const VisualizarEstoquePage({Key? key}) : super(key: key);
+  final appMedicamento = APPMedicamento();
 
   @override
   Widget build(BuildContext context) {
@@ -20,21 +24,41 @@ class VisualizarEstoquePage extends StatelessWidget {
       body: Container(
         color: const Color(0xFFF0F4EF),
         padding: const EdgeInsets.all(12.0),
-        child: ListView(
-          children: [
-            _buildEstoqueItem('Medicamento A', 'Em estoque: 50 unidades', '2024-12-01'),
-            _buildEstoqueItem('Medicamento B', 'Em estoque: 30 unidades', '2024-12-02'),
-            _buildEstoqueItem('Medicamento C', 'Em estoque: 100 unidades', '2024-12-03'),
-            _buildEstoqueItem('Medicamento D', 'Em estoque: 20 unidades', '2024-12-04'),
-            _buildEstoqueItem('Medicamento E', 'Em estoque: 10 unidades', '2024-12-05'),
-          ],
+        child: FutureBuilder<List<DTOMedicamento>>(
+          future:
+              appMedicamento.consultar(), // Chama a consulta ao banco de dados
+          builder: (context, snapshot) {
+            if (snapshot.connectionState == ConnectionState.waiting) {
+              return Center(
+                  child:
+                      CircularProgressIndicator()); // Exibe um carregamento enquanto os dados estão sendo buscados
+            } else if (snapshot.hasError) {
+              return Center(
+                  child: Text(
+                      'Erro: ${snapshot.error}')); // Exibe um erro caso algo dê errado
+            } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
+              return Center(
+                  child: Text(
+                      'Nenhum medicamento encontrado')); // Exibe mensagem caso não tenha dados
+            } else {
+              final listaMedicamentos = snapshot.data!;
+              return ListView.builder(
+                itemCount: listaMedicamentos.length,
+                itemBuilder: (context, index) {
+                  final medicamento = listaMedicamentos[index];
+                  return _buildEstoqueItem(
+                      dto: medicamento); // Exibe o item da lista
+                },
+              );
+            }
+          },
         ),
       ),
     );
   }
 
   // Widget para um item de estoque com botões de Editar e Excluir
-  Widget _buildEstoqueItem(String nome, String descricao, String data) {
+  Widget _buildEstoqueItem({required DTOMedicamento dto}) {
     return Card(
       elevation: 3,
       shape: RoundedRectangleBorder(
@@ -47,7 +71,7 @@ class VisualizarEstoquePage extends StatelessWidget {
           size: 36,
         ),
         title: Text(
-          nome,
+          dto.nome,
           style: const TextStyle(
             fontSize: 18,
             fontWeight: FontWeight.bold,
@@ -55,7 +79,7 @@ class VisualizarEstoquePage extends StatelessWidget {
           ),
         ),
         subtitle: Text(
-          '$descricao\nData de cadastro: $data',
+          'Quantidade: ${dto.quantidade} \nData de validade: ${dto.validade}',
           style: const TextStyle(
             fontSize: 14,
             color: Colors.black54,
@@ -68,14 +92,13 @@ class VisualizarEstoquePage extends StatelessWidget {
               icon: const Icon(Icons.edit, color: Colors.orange),
               onPressed: () {
                 // Ação de editar - Redirecionar para tela de edição (em breve)
-                print('Editar: $nome');
+                print('Editar:');
               },
             ),
             IconButton(
               icon: const Icon(Icons.delete, color: Colors.red),
-              onPressed: () {
-                // Ação de excluir - Excluir item (em breve)
-                print('Excluir: $nome');
+              onPressed: () async {
+               // appMedicamento.excluir(int.parse(dto.id));
               },
             ),
           ],

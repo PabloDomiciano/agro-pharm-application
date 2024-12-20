@@ -19,31 +19,31 @@ class _CadastroMedicamentoPageState extends State<CadastroMedicamentoPage> {
     final _validadeController = TextEditingController();
     final _fornecedorController = TextEditingController();
 
-    Future<void> criarMedicamento() async {
+    criarMedicamento() async {
       if (_cadastroKey.currentState!.validate()) {
         final nome = _nomeController.text;
         final quantidade = _quantidadeController.text;
         final validade = _validadeController.text;
         final fornecedor = _fornecedorController.text;
+        try {
+          DTOMedicamento dto = DTOMedicamento(
+            nome: nome,
+            quantidade: int.parse(quantidade),
+            validade: _convertStringToDate(validade),
+            fornecedor: fornecedor,
+          );
 
-        DTOMedicamento dto = DTOMedicamento(
-          nome: nome,
-          quantidade: int.parse(quantidade),
-          validade: DateTime.parse(validade),
-          fornecedor: fornecedor,
-        );
+          APPMedicamento appMedicamento = APPMedicamento();
+          await appMedicamento.salvar(dto);
 
-        APPMedicamento appMedicamento = APPMedicamento();
-        await appMedicamento.salvar(dto);
-
-        _nomeController.clear();
-        _quantidadeController.clear();
-        _validadeController.clear();
-        _fornecedorController.clear();
-
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Medicamento salvo com sucesso')),
-        );
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text('Medicamento salvo com sucesso')),
+          );
+        } catch (e) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text('$e')),
+          );
+        }
       }
     }
 
@@ -163,5 +163,18 @@ class _CadastroMedicamentoPageState extends State<CadastroMedicamentoPage> {
         ),
       ),
     );
+  }
+
+  DateTime _convertStringToDate(String dateString) {
+    // Formato esperado: dd/MM/yyyy
+    List<String> parts = dateString.split('/');
+    if (parts.length == 3) {
+      int day = int.parse(parts[0]);
+      int month = int.parse(parts[1]);
+      int year = int.parse(parts[2]);
+      return DateTime(year, month, day);
+    } else {
+      throw FormatException('Formato de data inválido');
+    }
   }
 }
